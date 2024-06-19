@@ -1,0 +1,43 @@
+[
+    {
+      "_id": {"$oid": "667267a965c831f238968a95"},
+      "userId": "6672670765c831f238968a7b",
+      "name": "Pistachio Cake Recipe",
+      "img": "https://res.cloudinary.com/djoxx3fl8/image/upload/v1718771796/RecipeWebApp/recipe1_hhufip.png",
+      "ingredients": ["Flour 180 gm", "Sugar 160 gm", "Butter 220 gm", "Ground pistachios 100 gm", "Baking powder 1 -1/2 tsp", "Eggs 4"],
+      "method": ["Cream butter and sugar.", "Add ground pistachios.", "Mix in eggs.", "Combine with flour and baking powder.", "Pour into a pan and bake for 30 minutes."]
+    },
+    {
+      "_id": {"$oid": "667267a965c831f238968a96"},
+      "userId": "6672672765c831f238968a7c",
+      "name": "Black Forest Cake Recipe",
+      "img": "https://res.cloudinary.com/djoxx3fl8/image/upload/v1718771796/RecipeWebApp/recipe1_hhufip.png",
+      "ingredients": ["Flour 190 gm", "Sugar 170 gm", "Butter 230 gm", "Cocoa powder 30 gm", "Baking powder 1 -1/2 tsp", "Chopped cherries 100 gm", "Eggs 4"],
+      "method": ["Cream butter and sugar.", "Add cocoa powder.", "Mix in eggs.", "Combine with flour and baking powder.", "Stir in chopped cherries.", "Pour into a pan and bake for 35 minutes."]
+    },
+    {
+      "_id": {"$oid": "667267a965c831f238968a97"},
+      "userId": "6672663c65c831f238968a7a",
+      "name": "Matcha Cake Recipe",
+      "img": "https://res.cloudinary.com/djoxx3fl8/image/upload/v1718771796/RecipeWebApp/recipe1_hhufip.png",
+      "ingredients": ["Flour 170 gm", "Sugar 150 gm", "Butter 220 gm", "Matcha powder 2 tbsp", "Baking powder 1 -1/2 tsp", "Eggs 3"],
+      "method": ["Cream butter and sugar.", "Add matcha powder.", "Mix in eggs.", "Combine with flour and baking powder.", "Pour into a pan and bake for 30 minutes."]
+    },
+    {
+      "_id": {"$oid": "667267a965c831f238968a98"},
+      "userId": "6672670765c831f238968a7b",
+      "name": "Cinnamon Cake Recipe",
+      "img": "https://res.cloudinary.com/djoxx3fl8/image/upload/v1718771796/RecipeWebApp/recipe1_hhufip.png",
+      "ingredients": ["Flour 180 gm", "Sugar 160 gm", "Butter 220 gm", "Ground cinnamon 2 tsp", "Baking powder 1 -1/2 tsp", "Eggs 3"],
+      "method": ["Cream butter and sugar.", "Add ground cinnamon.", "Mix in eggs.", "Combine with flour and baking powder.", "Pour into a pan and bake for 30 minutes."]
+    },
+    {
+      "_id": {"$oid": "667267a965c831f238968a99"},
+      "userId": "6672672765c831f238968a7c",
+      "name": "Butterscotch Cake Recipe",
+      "img": "https://res.cloudinary.com/djoxx3fl8/image/upload/v1718771796/RecipeWebApp/recipe1_hhufip.png",
+      "ingredients": ["Flour 170 gm", "Sugar 150 gm", "Butter 220 gm", "Butterscotch sauce 100 gm", "Baking powder 1 -1/2 tsp", "Eggs 3"],
+      "method": ["Cream butter and sugar.", "Add butterscotch sauce.", "Mix in eggs.", "Combine with flour and baking powder.", "Pour into a pan and bake for 30 minutes."]
+    }
+  ]
+  
