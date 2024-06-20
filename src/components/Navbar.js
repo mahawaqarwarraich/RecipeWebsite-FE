@@ -17,7 +17,7 @@ const Navbar = () => {
             <div className='hidden sm:flex space-x-5 text-white text-xs items-center lg:text-lg lg:space-x-8'>
                 <a className='cursor-pointer hover:underline' href='/'>Home</a>
                 <a className='cursor-pointer hover:underline' href='/recipes'>All Recipes</a>
-                <a className='cursor-pointer hover:underline' href='/upload'>Upload Recipe</a>
+                <a className='cursor-pointer hover:underline' href='/add-recipe'>Upload Recipe</a>
 
             </div>
 
@@ -46,7 +46,7 @@ const Navbar = () => {
             <a className='text-white cursor-pointer hover:underline' href='/recipes'>
               All Recipes
             </a>
-            <a className='text-white cursor-pointer hover:underline' href='/about'>
+            <a className='text-white cursor-pointer hover:underline' href='/add-recipe'>
               Upload Recipe
             </a>
             <a className='text-white cursor-pointer hover:underline' href='/signin'>
