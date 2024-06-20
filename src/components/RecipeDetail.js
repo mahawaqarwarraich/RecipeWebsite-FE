@@ -33,7 +33,11 @@ const RecipeDetail = () => {
     <>
       <div className="flex flex-col gap-5 mt-8 ml-11">
         <h1 className="text-xl font-semibold">{name}</h1>
-        <img src={img || '/assets/recipes/cake.png'} alt={name} className="w-[600px] h-[338px]" />
+        <div>
+        <img src={img || '/assets/recipes/cake.png'} alt={name} className="md:w-[600px] md:h-[338px] w-[300] h-[169] mr-8" />
+       
+        </div>
+        
         
         <h2 className="text-xl font-semibold">Ingredients:</h2>
         <ul className="list-disc list-inside">
