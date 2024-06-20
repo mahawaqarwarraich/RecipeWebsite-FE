@@ -2,10 +2,8 @@ import React, { useState } from 'react';
 
 const SignUp = () => {
   const [formData, setFormData] = useState({
-    email: '',
     username: '',
-    password: '',
-    confirmPassword: ''
+    password: ''
   });
 
   const [errors, setErrors] = useState({});
@@ -31,74 +29,45 @@ const SignUp = () => {
 
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.email.trim()) newErrors.email = true;
     if (!formData.username.trim()) newErrors.username = true;
     if (!formData.password.trim()) newErrors.password = true;
-    if (!formData.confirmPassword.trim()) newErrors.confirmPassword = true;
-    if (formData.password !== formData.confirmPassword) {
-      newErrors.confirmPassword = true;
-    }
     return newErrors;
   };
 
   return (
-    <div className="container mx-auto max-w-md mt-10">
-      <h1 className="text-2xl font-bold text-center mb-5">Sign Up</h1>
-      <form onSubmit={handleSubmit}>
-        <div className="mb-4">
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-          <input
-            type="email"
-            id="email"
-            name="email"
-            value={formData.email}
-            onChange={handleChange}
-            className={`mt-1 block w-full p-2 border ${errors.email && 'border-red-500'}`}
-            placeholder="Enter email"
-          />
-          {errors.email && <p className="text-red-500 text-sm">Email is required</p>}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
-          <input
-            type="text"
-            id="username"
-            name="username"
-            value={formData.username}
-            onChange={handleChange}
-            className={`mt-1 block w-full p-2 border ${errors.username && 'border-red-500'}`}
-            placeholder="Enter username"
-          />
-          {errors.username && <p className="text-red-500 text-sm">Username is required</p>}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            value={formData.password}
-            onChange={handleChange}
-            className={`mt-1 block w-full p-2 border ${errors.password && 'border-red-500'}`}
-            placeholder="Enter password"
-          />
-          {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
-        </div>
-        <div className="mb-4">
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">Confirm Password</label>
-          <input
-            type="password"
-            id="confirmPassword"
-            name="confirmPassword"
-            value={formData.confirmPassword}
-            onChange={handleChange}
-            className={`mt-1 block w-full p-2 border ${errors.confirmPassword && 'border-red-500'}`}
-            placeholder="Confirm password"
-          />
-          {errors.confirmPassword && <p className="text-red-500 text-sm">Passwords do not match</p>}
-        </div>
-        <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">Create Account</button>
-      </form>
+    <div className="flex justify-center items-center h-screen">
+      <div className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 w-1/3">
+        <h2 className="text-center text-2xl mb-4">Sign Up</h2>
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="mb-4">
+            <label htmlFor="username" className="block text-sm font-medium text-gray-700">Username</label>
+            <input
+              type="text"
+              id="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              className={`mt-1 block w-full p-2 border ${errors.username && 'border-red-500'}`}
+              placeholder="Enter username"
+            />
+            {errors.username && <p className="text-red-500 text-sm">Username is required</p>}
+          </div>
+          <div className="mb-4">
+            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <input
+              type="password"
+              id="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              className={`mt-1 block w-full p-2 border ${errors.password && 'border-red-500'}`}
+              placeholder="Enter password"
+            />
+            {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
+          </div>
+          <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">Create Account</button>
+        </form>
+      </div>
     </div>
   );
 };
