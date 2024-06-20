@@ -5,7 +5,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import RecipeDetail from './components/RecipeDetail';
-import RecipeForm from './RecipeForm'; // Import the RecipeForm component
+import RecipeForm from './components/RecipeForm'; // Import the RecipeForm component
 
 function App() {
   const location = useLocation();
