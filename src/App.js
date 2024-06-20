@@ -5,24 +5,22 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import RecipeDetail from './components/RecipeDetail';
+import RecipeForm from './RecipeForm'; // Import the RecipeForm component
 
 function App() {
   const location = useLocation();
   return (
     <>
-   
-    {location.pathname !== '/' && <Navbar />}
+      {location.pathname !== '/' && <Navbar />}
 
       <Routes>
-        
         <Route path="/" element={<Home />} />
         <Route path="/recipes" element={<Recipe />} />
-        <Route path="/recipe-detail/:id" element={<RecipeDetail/>} />
+        <Route path="/recipe-detail/:id" element={<RecipeDetail />} />
+        <Route path="/add-recipe" element={<RecipeForm />} /> {/* Add this line to include the RecipeForm route */}
       </Routes>
-      
-       
+
       {location.pathname !== '/' && <Footer />}
-     
     </>
   );
 }
