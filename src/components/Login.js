@@ -44,7 +44,7 @@ const Login = () => {
               className="mt-1 p-2 block w-full border border-gray-300 rounded-md" 
             />
           </div>
-          <div>
+          <div className='mb-3'>
             <label htmlFor="password" className="block text-gray-700">Password</label>
             <input 
               id="password" 
@@ -53,10 +53,10 @@ const Login = () => {
               placeholder="Enter password (min 8 characters)" 
               value={formData.password} 
               onChange={handleChange} 
-              className="mt-1 p-2 block w-full border border-gray-300 rounded-md" 
+              className="mt-1 p-2 block w-full border border-gray-300 rounded-md mb-12" 
             />
           </div>
-          <div>
+          <div className='flex justify-center mt-11'>
             <button type="submit" className="bg-green-500 text-white px-4 py-2 rounded-md">Login</button>
           </div>
         </form>

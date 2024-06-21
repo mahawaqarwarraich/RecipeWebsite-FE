@@ -60,12 +60,16 @@ const SignUp = () => {
               name="password"
               value={formData.password}
               onChange={handleChange}
-              className={`mt-1 block w-full p-2 border ${errors.password && 'border-red-500'}`}
+              className={`mt-1 block w-full mb-12 p-2 border ${errors.password && 'border-red-500'}`}
               placeholder="Enter password"
             />
             {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
           </div>
+          <div className='flex justify-center'>
+
           <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">Create Account</button>
+          </div>
+        
         </form>
       </div>
     </div>
