@@ -27,18 +27,39 @@ const RecipeForm = () => {
     return newErrors;
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const validationErrors = validateForm();
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length === 0) {
-      alert('Recipe uploaded successfully!');
-      setFormData({
-        recipeImage: null,
-        recipeName: '',
-        ingredients: '',
-        method: '',
-      });
+      // Prepare the data to be sent in the POST request
+      const data = new FormData();
+      data.append('recipeImage', formData.recipeImage);
+      data.append('recipeName', formData.recipeName);
+      data.append('ingredients', JSON.stringify(formData.ingredients.split(',').map(item => item.trim())));
+      data.append('method', JSON.stringify(formData.method.split(',').map(item => item.trim())));
+
+      try {
+        const response = await fetch('/api/recipes/create-recipe', {
+          method: 'POST',
+          body: data,
+        });
+
+        if (response.ok) {
+          alert('Recipe uploaded successfully!');
+          setFormData({
+            recipeImage: null,
+            recipeName: '',
+            ingredients: '',
+            method: '',
+          });
+        } else {
+          alert('Failed to upload recipe.');
+        }
+      } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while uploading the recipe.');
+      }
     } else {
       alert('Please fill in all fields.');
     }

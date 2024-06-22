@@ -1,37 +1,59 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const SignUp = () => {
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
 
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-  
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-  };
 
-  const handleSubmit = (e) => {
+  const navigate = useNavigate();
+
+  // form function
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationErrors = validateForm();
-    if (Object.keys(validationErrors).length === 0) {
-      // Perform signup logic here
-      console.log('Signup successful!', formData);
-    } else {
-      setErrors(validationErrors);
+
+    // Validation
+    const newErrors = {};
+    if (!username.trim()) newErrors.username = 'Username is required';
+    if (!password.trim()) newErrors.password = 'Password is required';
+
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      return;
+    }
+
+    try {
+      const res = await axios.post("/users", {
+        username,
+        password
+      });
+      if (res && res.data.success) {
+        toast.success(res.data && res.data.message);
+        navigate("/login");
+      } else {
+        toast.error(res.data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong");
     }
   };
 
-  const validateForm = () => {
-    const newErrors = {};
-    if (!formData.username.trim()) newErrors.username = true;
-    if (!formData.password.trim()) newErrors.password = true;
-    return newErrors;
+  const handleUsernameChange = (e) => {
+    setUsername(e.target.value);
+    if (errors.username) {
+      setErrors((prevErrors) => ({ ...prevErrors, username: '' }));
+    }
+  };
+
+  const handlePasswordChange = (e) => {
+    setPassword(e.target.value);
+    if (errors.password) {
+      setErrors((prevErrors) => ({ ...prevErrors, password: '' }));
+    }
   };
 
   return (
@@ -45,12 +67,12 @@ const SignUp = () => {
               type="text"
               id="username"
               name="username"
-              value={formData.username}
-              onChange={handleChange}
+              value={username}
+              onChange={handleUsernameChange}
               className={`mt-1 block w-full p-2 border ${errors.username && 'border-red-500'}`}
               placeholder="Enter username"
             />
-            {errors.username && <p className="text-red-500 text-sm">Username is required</p>}
+            {errors.username && <p className="text-red-500 text-sm mt-1">{errors.username}</p>}
           </div>
           <div className="mb-4">
             <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
@@ -58,18 +80,16 @@ const SignUp = () => {
               type="password"
               id="password"
               name="password"
-              value={formData.password}
-              onChange={handleChange}
-              className={`mt-1 block w-full mb-12 p-2 border ${errors.password && 'border-red-500'}`}
+              value={password}
+              onChange={handlePasswordChange}
+              className={`mt-1 block w-full p-2 border ${errors.password && 'border-red-500'}`}
               placeholder="Enter password"
             />
-            {errors.password && <p className="text-red-500 text-sm">Password is required</p>}
+            {errors.password && <p className="text-red-500 text-sm mt-1">{errors.password}</p>}
           </div>
-          <div className='flex justify-center'>
-
-          <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">Create Account</button>
+          <div className="flex justify-center">
+            <button type="submit" className="bg-green-500 text-white py-2 px-4 rounded">Create Account</button>
           </div>
-        
         </form>
       </div>
     </div>
