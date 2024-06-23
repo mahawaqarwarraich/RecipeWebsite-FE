@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import axios from 'axios'
 import { useAuth } from "../context/auth";  // Make sure the path is correct
+import toast from "react-hot-toast";
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -12,7 +14,8 @@ const RecipeDetail = () => {
   const [commentText, setCommentText] = useState("");
   const [error, setError] = useState("");
   const [recipe, setRecipe] = useState({});
-  const [auth] = useAuth();  // Destructure auth from useAuth
+  const [auth, setAuth] = useAuth();  // Destructure auth from useAuth
+  const navigate = useNavigate()
 
   console.log("recipe id", id);
 
@@ -31,6 +34,20 @@ const RecipeDetail = () => {
       console.error("Error fetching the recipe:", error);
     }
   };
+
+  const handleDelete  = async (id) => {
+   try {
+    const res = await axios.delete(`/recipes/${id}`);
+    if (res.data.success) {
+      toast.success('Recipe deleted successfully')
+      navigate('/recipes')
+    } else {
+      toast.error('Error deleting recipe')
+    }
+   } catch(error) {
+    toast.error('Something went wrong')
+   }
+  }
 
   // Get comments
   const getComments = async () => {
@@ -97,8 +114,9 @@ const RecipeDetail = () => {
 
         {recipe?.userId === auth?.user?._id && (
           <div className="flex space-x-3 mt-8">
-            <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Edit</button>
-            <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Delete</button>
+          <a className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded" href={`/edit/${id}`}>Edit</a>
+
+            <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded" onClick={handleDelete}>Delete</button>
           </div>
         )}
 

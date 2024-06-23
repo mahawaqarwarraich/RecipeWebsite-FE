@@ -1,79 +1,116 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/auth";
+import axios from 'axios';
 
 function Recipe() {
   const [recipes, setRecipes] = useState([]);
   const [statePageNo, setPageNo] = useState(1);
-  const [statePageSize, setPageSize] = useState(6);
+  const [statePageSize] = useState(6); // Fixed pageSize, no need for state
   const [stateTotalPage, setTotalPage] = useState(0);
+  const [error, setError] = useState('');
+  const [auth, setAuth] = useAuth();
+  const [favouriteRecipeIds, setFavouriteRecipeIds] = useState([]);
 
+  // Fetch recipes based on pageNo
   const getRecipes = async () => {
     try {
-      let myEndPoint = `http://localhost:8080/recipe/all-recipes?page=${statePageNo}&pageSize=${statePageSize}`;
-      let receivedData = await fetch(myEndPoint);
-      if (!receivedData.ok) {
+      const response = await axios.get(`http://localhost:8080/recipe/all-recipes?page=${statePageNo}&pageSize=${statePageSize}`);
+      
+      if (response.status === 200) {
+        const parsedData = response.data;
+        const countPage = Math.ceil(parsedData.totalRecipes / statePageSize);
+        setTotalPage(countPage);
+        setRecipes(parsedData.data);
+      } else {
         throw new Error("Failed to fetch recipes");
       }
-      let parsedData = await receivedData.json();
-      let countPage = Math.ceil(parsedData.totalRecipes / statePageSize);
-      
-      setTotalPage(countPage);
-      setRecipes(parsedData.data);
     } catch (error) {
       console.error("Error fetching recipes:", error);
+      setError("Failed to fetch recipes. Please try again later.");
     }
   };
 
-  const handleNextRecipes = async () => {
-    await setPageNo(statePageNo + 1);
-    let myEndpoint = `http://localhost:8080/recipe/all-recipes&page=${statePageNo}&pageSize=${statePageSize}`;
-    let myData = await fetch(myEndpoint); /* Must wait for fetching */
-    let parsedData = await myData.json(); /* Must wait for myData.json */
-    
-    setRecipes(parsedData.data);
-  };
-
-  const handlePreviousRecipes = async () => {
-    await setPageNo(statePageNo - 1);
-  };
-
-  const toggleFavorite = async (index) => {
-    const updatedRecipes = [...recipes];
-    const recipe = updatedRecipes[index];
-    updatedRecipes[index].isFavourite = !updatedRecipes[index].isFavourite;
-    setRecipes(updatedRecipes);
-
-    // const recipesArr = [...recipes];
-    // const recipe = recipesArr[index];
-    
-
-    //Update the recipe in the backend
+  // Fetch favourite recipes based on pageNo
+  const getFavourites = async () => {
     try {
-      let response = await fetch(`http://localhost:8080/recipe/toggle-favourite/${recipe._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        }
-       
-      });
-
-      if (!response.success) { 
-        throw new Error('Failed to update recipe');
+      const response = await axios.get(`http://localhost:8080/recipe/favourite-recipes/${auth?.user?._id}?page=${statePageNo}&pageSize=${statePageSize}`);
+      
+      if (response.status === 200) {
+        const parsedData = response.data;
+        const countPage = Math.ceil(parsedData.totalFavourites / statePageSize);
+        setTotalPage(countPage);
+        const ids = parsedData.data.map(fav => fav.recipeId);
+        setFavouriteRecipeIds(ids);
       } else {
-        // display notification
+        throw new Error("Failed to fetch favourite recipes");
+      }
+    } catch (error) {
+      console.error("Error fetching favourite recipes:", error);
+      setError("Failed to fetch favourite recipes. Please try again later.");
+    }
+  };
+
+  // Handle next page for recipes
+  const handleNextRecipes = () => {
+    setPageNo(prevPageNo => prevPageNo + 1);
+  };
+
+  // Handle previous page for recipes
+  const handlePreviousRecipes = () => {
+    setPageNo(prevPageNo => prevPageNo - 1);
+  };
+
+  // Toggle favourite status for a recipe
+  const toggleFavorite = async (recipeId, index) => {
+    try {
+      const updatedRecipes = [...recipes];
+      const isFavourite = favouriteRecipeIds.includes(recipeId);
+      updatedRecipes[index].isFavourite = !isFavourite;
+      setRecipes(updatedRecipes);
+
+      // Determine endpoint and HTTP method based on current favourite status
+      let endpoint, method;
+      if (isFavourite) {
+        endpoint = `/favourites/${recipeId}`;
+        method = 'DELETE';
+      } else {
+        endpoint = '/favourites';
+        method = 'POST';
       }
 
-     
-    } catch (error) {
-      console.error('Error updating recipe:', error);
-    }
-   };
+      // Send request to update favourite status
+      const response = await axios({
+        method,
+        url: endpoint,
+        data: { userId: auth?.user?._id, recipeId }
+      });
 
+      if (response.data.success) {
+        toast.success(response.data.message);
+        if (method === 'DELETE') {
+          setFavouriteRecipeIds(favouriteRecipeIds.filter(id => id !== recipeId));
+        } else {
+          setFavouriteRecipeIds([...favouriteRecipeIds, recipeId]);
+        }
+      } else {
+        toast.error(response.data.message);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
+      toast.error("Something went wrong in post");
+    }
+  };
+
+  // Fetch recipes and favourites on initial load and when pageNo changes
   useEffect(() => {
     getRecipes();
-  }, [statePageNo]);
+    getFavourites();
+  }, [statePageNo]); // Only re-run effect if statePageNo changes
 
   return (
     <>
+      
       <div className="m-10">
         <div className="flex items-center my-4 mb-8">
           <div className="flex-grow border-t border-green-500"></div>
@@ -93,8 +130,8 @@ function Recipe() {
                   className="w-full h-[169px] object-cover cursor-pointer transform transition-transform duration-300 hover:scale-110"
                 />
               </a>
-              <div className="absolute top-2 right-2 bg-white p-1 rounded-full cursor-pointer" onClick={() => toggleFavorite(index)}>
-                {element.isFavourite ? (
+              <div className="absolute top-2 right-2 bg-white p-1 rounded-full cursor-pointer" onClick={() => toggleFavorite(element._id, index)}>
+                {favouriteRecipeIds.includes(element._id) ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="green"
@@ -128,7 +165,8 @@ function Recipe() {
               </div>
               <div className="border-gray-300 border w-[300px] p-4">
                 <h2 className="text-xl cursor-pointer">{element.name}</h2>
-                <p className="mt-1 text-lg">{element.createdAt}</p>
+              {/*<p className="mt-1 text-md">{new Date(element.createdAt).toISOString().split('T')[0]}</p>*/}  
+
               </div>
             </div>
           ))}

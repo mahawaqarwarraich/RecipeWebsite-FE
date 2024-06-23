@@ -9,6 +9,7 @@ import RecipeForm from './components/RecipeForm';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 import Favourite from './components/Favourite';
+import EditForm from './components/EditForm'
 import { Toaster } from 'react-hot-toast';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/SignUp" element={<SignUp />} />
         <Route path="/favourite-recipes" element={<Favourite />} />
+        <Route path="/edit/:id" element={<EditForm />} />
       </Routes>
 
       {location.pathname !== '/' && <Footer />}

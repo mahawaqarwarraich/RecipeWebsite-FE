@@ -1,19 +1,49 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { useAuth } from '../context/auth';
 import toast from 'react-hot-toast';
-import axios from 'axios'; // Import Axios
+import axios from 'axios';
 
-
-const RecipeForm = () => {
+const EditForm = () => {
   const [auth, setAuth] = useAuth();
+  const { id } = useParams();
+  const [name, setName] = useState('');
+  const [ingredients, setIngredients] = useState('');
+  const [method, setMethod] = useState('');
+
+  const getSingleRecipe = async () => {
+    try {
+      const res = await axios.get(`/recipe/single-recipe/${id}`);
+      if (res.data.success) {
+        const { name, ingredients, method } = res.data.data;
+        setName(name);
+        setIngredients(ingredients.join(', ')); // Convert array to comma-separated string
+        setMethod(method.join(', ')); // Convert array to comma-separated string
+
+        // Pre-populate form data
+        setFormData({
+          ...formData,
+          recipeName: name,
+          ingredients: ingredients.join(', '),
+          method: method.join(', ')
+        });
+      }
+    } catch (error) {
+      console.error('Error fetching recipe:', error);
+    }
+  };
+
+  useEffect(() => {
+    getSingleRecipe();
+  }, [id]);
+
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     recipeImage: null,
-    recipeName: '',
-    ingredients: '',
-    method: '',
+    recipeName: '', // Initialize as empty string
+    ingredients: '', // Initialize as empty string
+    method: '' // Initialize as empty string
   });
 
   const [errors, setErrors] = useState({});
@@ -39,34 +69,33 @@ const RecipeForm = () => {
     e.preventDefault();
     const validationErrors = validateForm();
     setErrors(validationErrors);
-    
+
     if (Object.keys(validationErrors).length === 0) {
-      // Prepare the data to be sent in the POST request
+      // Prepare the data to be sent in the PUT request
       const data = new FormData();
       data.append('img', formData.recipeImage);
       data.append('name', formData.recipeName);
       data.append('ingredients', JSON.stringify(formData.ingredients.split(',').map(item => item.trim())));
       data.append('method', JSON.stringify(formData.method.split(',').map(item => item.trim())));
-      data.append('userId', auth?.user?._id)
+      data.append('userId', auth?.user?._id);
 
       try {
-        const response = await axios.post('/recipes', data); // Use axios.post for POST request
-        console.log('response', response)
+        const response = await axios.put(`/recipes/${id}`, data);
         if (response.data.success) {
-          toast.success('Recipe uploaded successfully');
-          navigate('/recipes')
+          toast.success('Recipe updated successfully');
+          navigate('/recipes');
           setFormData({
             recipeImage: null,
             recipeName: '',
             ingredients: '',
-            method: '',
+            method: ''
           });
         } else {
-          toast.error('Failed to upload recipe');
+          toast.error('Failed to update recipe');
         }
       } catch (error) {
         console.error('Error:', error);
-        toast.error('An error occurred while uploading the recipe');
+        toast.error('An error occurred while updating the recipe');
       }
     } else {
       toast.error('Please fill in all fields');
@@ -76,7 +105,7 @@ const RecipeForm = () => {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">New Recipe</h2>
+        <h2 className="text-2xl font-bold mb-6 text-center">Update Recipe</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700">Recipe Image</label>
@@ -121,11 +150,11 @@ const RecipeForm = () => {
               className={`mt-1 block w-full p-2 border ${errors.method ? 'border-red-500' : 'border-gray-300'} rounded-md`}
             />
           </div>
-          <button type="submit" className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600">Upload</button>
+          <button type="submit" className="w-full bg-green-500 text-white p-2 rounded-md hover:bg-green-600">Update</button>
         </form>
       </div>
     </div>
   );
 };
 
-export default RecipeForm;
+export default EditForm;

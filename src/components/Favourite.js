@@ -1,14 +1,38 @@
 import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+import { useAuth } from "../context/auth";
+import axios from 'axios';
 
-function Favourite() {
+function Recipe() {
   const [recipes, setRecipes] = useState([]);
   const [statePageNo, setPageNo] = useState(1);
   const [statePageSize, setPageSize] = useState(6);
   const [stateTotalPage, setTotalPage] = useState(0);
+  const [error, setError] = useState('');
+  const [auth, setAuth] = useAuth();
+  const [favouriteRecipeIds, setFavouriteRecipeIds] = useState([]);
+
+  const getFavourites = async () => {
+    try {
+      let myEndPoint = `http://localhost:8080/recipe/favourite-recipes/${auth?.user?._id}?page=${statePageNo}&pageSize=${statePageSize}`;
+      let receivedData = await fetch(myEndPoint);
+      if (!receivedData.ok) {
+        throw new Error("Failed to fetch favourite recipes");
+      }
+      let parsedData = await receivedData.json();
+      let countPage = Math.ceil(parsedData.totalFavourites / statePageSize);
+      
+      setTotalPage(countPage);
+      const ids = parsedData.data.map(fav => fav.recipeId);
+      setFavouriteRecipeIds(ids);
+    } catch (error) {
+      console.error("Error fetching favourite recipes:", error);
+    }
+  };
 
   const getRecipes = async () => {
     try {
-      let myEndPoint = `http://localhost:8080/recipe/favourite-recipes?page=${statePageNo}&pageSize=${statePageSize}`;
+      let myEndPoint = `http://localhost:8080/recipe/all-recipes?page=${statePageNo}&pageSize=${statePageSize}`;
       let receivedData = await fetch(myEndPoint);
       if (!receivedData.ok) {
         throw new Error("Failed to fetch recipes");
@@ -24,49 +48,57 @@ function Favourite() {
   };
 
   const handleNextRecipes = async () => {
-    await setPageNo(statePageNo + 1);
-    let myEndpoint = `http://localhost:8080/recipe/all-recipes&page=${statePageNo}&pageSize=${statePageSize}`;
-    let myData = await fetch(myEndpoint); /* Must wait for fetching */
-    let parsedData = await myData.json(); /* Must wait for myData.json */
-    
-    setRecipes(parsedData.data);
+    setPageNo(statePageNo + 1);
+    getRecipes();
   };
 
   const handlePreviousRecipes = async () => {
-    await setPageNo(statePageNo - 1);
+    setPageNo(statePageNo - 1);
+    getRecipes();
   };
 
-  const toggleFavorite = async (index) => {
-    const updatedRecipes = [...recipes];
-    const recipe = updatedRecipes[index];
-    updatedRecipes[index].isFavourite = !updatedRecipes[index].isFavourite;
-    setRecipes(updatedRecipes);
-
-    // const recipesArr = [...recipes];
-    // const recipe = recipesArr[index];
-    
-
-    //Update the recipe in the backend
+  const toggleFavorite = async (recipeId, index) => {
     try {
-      let response = await fetch(`http://localhost:8080/recipe/toggle-favourite/${recipe._id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
+      const updatedRecipes = [...recipes];
+      const isFavourite = favouriteRecipeIds.includes(recipeId);
+      updatedRecipes[index].isFavourite = !isFavourite;
+      setRecipes(updatedRecipes);
+
+      if (isFavourite) {
+        // Remove from favourites
+        const res = await axios.delete(`/favourites/${recipeId}`, {
+          data: { userId: auth?.user?._id }
+        });
+
+        if (res.data.success) {
+          toast.success(res.data.message);
+          setFavouriteRecipeIds(favouriteRecipeIds.filter(id => id !== recipeId));
+        } else {
+          toast.error(res.data.message);
         }
-       
-      });
-
-      if (!response.success) { 
-        throw new Error('Failed to update recipe');
       } else {
-        // display notification
-      }
+        // Add to favourites
+        const res = await axios.post("/favourites", {
+          userId: auth?.user?._id,
+          recipeId
+        });
 
-     
+        if (res.data.success) {
+          toast.success(res.data.message);
+          setFavouriteRecipeIds([...favouriteRecipeIds, recipeId]);
+        } else {
+          toast.error(res.data.message);
+        }
+      }
     } catch (error) {
-      console.error('Error updating recipe:', error);
+      console.error('Error toggling favorite:', error);
+      toast.error("Something went wrong in post");
     }
-   };
+  };
+
+  useEffect(() => {
+    getFavourites();
+  }, [statePageNo]);
 
   useEffect(() => {
     getRecipes();
@@ -74,6 +106,7 @@ function Favourite() {
 
   return (
     <>
+      {error && <div>{error}</div>}
       <div className="m-10">
         <div className="flex items-center my-4 mb-8">
           <div className="flex-grow border-t border-green-500"></div>
@@ -84,7 +117,7 @@ function Favourite() {
 
       <div className="flex flex-col space-x-10 items-center justify-center lg:flex-row">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {recipes.map((element, index) => (
+          {recipes.filter(recipe => favouriteRecipeIds.includes(recipe._id)).map((element, index) => (
             <div key={index} className="mb-5 rounded-full w-[300px] relative">
               <a href={`/recipe-detail/${element._id}`}>
                 <img
@@ -93,8 +126,8 @@ function Favourite() {
                   className="w-full h-[169px] object-cover cursor-pointer transform transition-transform duration-300 hover:scale-110"
                 />
               </a>
-              <div className="absolute top-2 right-2 bg-white p-1 rounded-full cursor-pointer" onClick={() => toggleFavorite(index)}>
-                {element.isFavourite ? (
+              <div className="absolute top-2 right-2 bg-white p-1 rounded-full cursor-pointer" onClick={() => toggleFavorite(element._id, index)}>
+                {favouriteRecipeIds.includes(element._id) ? (
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     fill="green"
@@ -143,4 +176,4 @@ function Favourite() {
   );
 }
 
-export default Favourite;
+export default Recipe;
