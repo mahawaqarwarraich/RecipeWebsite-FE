@@ -1,5 +1,6 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
+import { useAuth } from "../context/auth";  // Make sure the path is correct
 
 const RecipeDetail = () => {
   const { id } = useParams();
@@ -10,15 +11,18 @@ const RecipeDetail = () => {
   const [comments, setComments] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [error, setError] = useState("");
+  const [recipe, setRecipe] = useState({});
+  const [auth] = useAuth();  // Destructure auth from useAuth
 
-  // Get single product
+  console.log("recipe id", id);
+
+  // Get single recipe
   const getSingleRecipe = async () => {
     try {
       const response = await fetch(`http://localhost:8080/recipe/single-recipe/${id}`);
       const res = await response.json();
       const data = res.data;
-      console.log("response", data);
-      console.log("ingredients", data.ingredients);
+      setRecipe(data);
       setName(data.name);
       setIngredients(data.ingredients);
       setMethod(data.method);
@@ -44,7 +48,6 @@ const RecipeDetail = () => {
     getSingleRecipe();
     getComments();
   }, [id]);
-
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
@@ -91,11 +94,13 @@ const RecipeDetail = () => {
             <li key={index}>{step}</li>
           ))}
         </ul>
-        
-        <div className="flex space-x-3 mt-8">
-          <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Edit</button>
-          <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Delete</button>
-        </div>
+
+        {recipe?.userId === auth?.user?._id && (
+          <div className="flex space-x-3 mt-8">
+            <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Edit</button>
+            <button className="bg-green-500 hover:bg-green-600 cursor-pointer text-white px-3 py-2 font-semibold rounded">Delete</button>
+          </div>
+        )}
 
         <hr className="my-8" />
 

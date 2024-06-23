@@ -1,6 +1,9 @@
 import React, { useState } from 'react';
+import { useAuth } from '../context/auth';
 
 const RecipeForm = () => {
+  const [auth,setAuth] = useAuth();
+
   const [formData, setFormData] = useState({
     recipeImage: null,
     recipeName: '',
@@ -66,6 +69,7 @@ const RecipeForm = () => {
   };
 
   return (
+  
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">New Recipe</h2>

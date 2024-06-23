@@ -26,7 +26,7 @@ const SignUp = () => {
     }
 
     try {
-      const res = await axios.post("/users", {
+      const res = await axios.post("/users/register", {
         username,
         password
       });
